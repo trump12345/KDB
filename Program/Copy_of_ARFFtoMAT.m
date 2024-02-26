@@ -1,4 +1,4 @@
-function matData=ARFFtoMAT(filename)
+function matData=Copy_of_ARFFtoMAT(filename)
 %读取arff文件完成缺失值填充，并对连续数据离散化，离散值为5
 %并对其中离散化后的数据进行离散编码。
 %input：文件路径
@@ -26,23 +26,22 @@ discretizer.setOptions(weka.core.Utils.splitOptions('-B 5'));
 
 % 应用离散化过滤器
 discretizedData = weka.filters.Filter.useFilter(data, discretizer);
-[matData,featureNames] =  weka2matlab(discretizedData);
-%[mdata, featureNames, targetNDX, stringVals, relationName] = weka2matlab(discretizedData);
+% 将 weka.core.Instances 对象转换为 MATLAB 的矩阵
+numInstances = discretizedData.numInstances();
+numAttributes = discretizedData.numAttributes();
+matData = nan(numInstances, numAttributes);
 
-% matData=[featureNames;num2cell(matData)];
-% matData = cell2mat(matData);
-matData = array2table(matData, 'VariableNames', featureNames);
+for i = 1:numInstances
+    instance = discretizedData.instance(i - 1);
+    for j = 1:numAttributes
+        if ~instance.isMissing(j - 1)
+            matData(i, j) = instance.value(j - 1);
+        end
+    end
+end
+matData=matData+1;
 
-%matData=cell2table(matData);
-%保存为xls文件
-% [filename, pathname] = uiputfile('*.xlsx','Save as');
-% % 如果取消了保存操作，则退出
-% if isequal(filename, 0) || isequal(pathname, 0)
-%     disp('保存操作已取消');
-%     return;
-% end
-% % 构建完整的文件路径
-% fullpath = fullfile(pathname, filename);
-% % 使用 writematrix 函数将矩阵保存为 Excel 文件
-%  writetable(matData, fullpath,'WriteVariableNames', true);
+% 指定保存位置和文件名
+savePath = fullfile('C:\Users\小范\Desktop\学学\dataset1', [filename, '.csv']);
+csvwrite(savePath, matData);
 end

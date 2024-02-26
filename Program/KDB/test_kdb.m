@@ -1,11 +1,14 @@
 clear;
-data = xlsread("anneal.xlsx");
+%data = xlsread("C:\Users\小范\Desktop\学学\dataset1\breast-cancer.xlsx");
+data = xlsread("output.py.xlsx");
+data(:,1)=[];
+data=data+1;
 data =data';
 [nNodes,sample]=size(data);%取行，列数量
 classify_node_num = nNodes; % 分类/标签节点
 node_flag = 'A';
 [node_sizes, node_type,node_names] = get_node(data,node_flag);
-%dag=learn_struct_KDB(data,classify_node_num,node_sizes,2);
+dag=learn_struct_KDB(data,classify_node_num,node_sizes,2);
 %view(biograph(dag));
 actual_Y = data(classify_node_num,:); % 真实标签值最后一列的真实值
 actual_Y_mat  = full(sparse(1:numel(actual_Y),actual_Y,1)); % 将Y值变为矩阵形式
@@ -20,7 +23,7 @@ for i = 1:cv.NumTestSets
     %# training    
     learn_start_time = cputime; % 开始学习时间
     %dag = mk_naive_struct(nNodes,classify_node_num);
-    dag=learn_struct_KDB(data,classify_node_num,node_sizes,3);
+    dag=learn_struct_KDB(data,classify_node_num,node_sizes,2);
     %view(biograph(dag));  %   查看网络拓扑结构
     %draw_graph(dag)
     % 2.2 参数学习
